@@ -129,7 +129,7 @@
         messages.innerHTML += `<div><b>You:</b> ${userMessage}</div>`;
         input.value = '';
 
-        const res = await fetch('https://your-huggingface-backend-url/chat', {
+        const res = await fetch('https://bhanutejadamera-quebec-chatbot-backend.hf.space/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: userMessage })
