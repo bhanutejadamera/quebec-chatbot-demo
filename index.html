@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quebec Solutions - AI Chatbot Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #002244;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      background-color: #003366;
+      padding: 10px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+    }
+    section.hero {
+      padding: 40px;
+      background-color: #e6f0ff;
+      text-align: center;
+    }
+    section.services {
+      padding: 20px;
+      background: white;
+    }
+    .service {
+      margin-bottom: 20px;
+    }
+    #chat-bubble {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #0078d4;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      z-index: 9999;
+    }
+    #chat-box {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      width: 300px;
+      height: 400px;
+      background-color: white;
+      border: 1px solid #ccc;
+      display: none;
+      flex-direction: column;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    input {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Quebec Solutions Inc.</h1>
+    <p>Innovating Tomorrow, Today.</p>
+  </header>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">Services</a>
+    <a href="#">Industries</a>
+    <a href="#">Careers</a>
+    <a href="#">Support</a>
+  </nav>
+  <section class="hero">
+    <h2>Powering your Digital Journey</h2>
+    <p>We offer innovative technology and customer-centric services that are simple, intuitive, and usable across industries including Healthcare, Defense, Aerospace, Agriculture, and more.</p>
+  </section>
+  <section class="services">
+    <h3>Our Services</h3>
+    <div class="service">
+      <strong>Technology & Engineering:</strong> Develop platforms that generate fresh opportunities.
+    </div>
+    <div class="service">
+      <strong>Product Management:</strong> Commitment to delivering value in all endeavors.
+    </div>
+    <div class="service">
+      <strong>Data & AI:</strong> Intelligence that generates enterprise value.
+    </div>
+    <div class="service">
+      <strong>Customer Experience:</strong> Brands and services used daily by millions.
+    </div>
+    <div class="service">
+      <strong>Strategy Consulting:</strong> Propelling digital enterprise evolution.
+    </div>
+  </section>
+
+  <div id="chat-bubble">💬 Chat with us</div>
+  <div id="chat-box">
+    <div id="messages"></div>
+    <input id="userInput" placeholder="Type your message..." />
+  </div>
+
+  <script>
+    const bubble = document.getElementById('chat-bubble');
+    const box = document.getElementById('chat-box');
+    const input = document.getElementById('userInput');
+    const messages = document.getElementById('messages');
+
+    bubble.onclick = () => box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+
+    input.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        const userMessage = input.value;
+        messages.innerHTML += `<div><b>You:</b> ${userMessage}</div>`;
+        input.value = '';
+
+        const res = await fetch('https://your-huggingface-backend-url/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMessage })
+        });
+        const data = await res.json();
+        messages.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
