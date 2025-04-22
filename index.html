@@ -2,151 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quebec Solutions - AI Chatbot Demo</title>
+  <title>Quebec Solutions – AI Chatbot</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #002244;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      background-color: #003366;
-      padding: 10px;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-    }
-    section.hero {
-      padding: 40px;
-      background-color: #e6f0ff;
-      text-align: center;
-    }
-    section.services {
-      padding: 20px;
-      background: white;
-    }
-    .service {
-      margin-bottom: 20px;
-    }
+    body { font-family: Arial; margin: 0; padding: 0; background: #f4f4f4; }
     #chat-bubble {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #0078d4;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 20px;
-      cursor: pointer;
-      z-index: 9999;
+      position: fixed; bottom: 20px; right: 20px;
+      background-color: #0078d4; color: white;
+      padding: 10px 15px; border-radius: 20px;
+      cursor: pointer; z-index: 9999;
     }
     #chat-box {
-      position: fixed;
-      bottom: 70px;
-      right: 20px;
-      width: 300px;
-      height: 400px;
-      background-color: white;
-      border: 1px solid #ccc;
-      display: none;
-      flex-direction: column;
-      padding: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: fixed; bottom: 70px; right: 20px;
+      width: 350px; height: 500px;
+      background-color: white; border: 1px solid #ccc;
+      border-radius: 10px;
+      display: none; flex-direction: column;
+      padding: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
       overflow: hidden;
     }
     #messages {
-      flex-grow: 1;
-      overflow-y: auto;
-      margin-bottom: 10px;
+      flex-grow: 1; overflow-y: auto; margin-bottom: 10px;
       font-size: 14px;
     }
+    .bot, .user {
+      margin: 6px 0; padding: 8px; border-radius: 8px; max-width: 85%;
+    }
+    .user {
+      background: #d0e6ff; align-self: flex-end;
+    }
+    .bot {
+      background: #f0f0f0;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .bot-avatar {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #0078d4; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 14px;
+    }
+    #typing {
+      font-style: italic; color: gray;
+    }
     input {
-      width: 100%;
-      padding: 6px;
+      padding: 6px; width: calc(100% - 12px); box-sizing: border-box;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Quebec Solutions Inc.</h1>
-    <p>Innovating Tomorrow, Today.</p>
-  </header>
 
-  <nav>
-    <a href="#">Home</a>
-    <a href="#">About</a>
-    <a href="#">Services</a>
-    <a href="#">Industries</a>
-    <a href="#">Careers</a>
-    <a href="#">Support</a>
-  </nav>
+<div id="chat-bubble">💬 Chat with us</div>
 
-  <section class="hero">
-    <h2>Powering your Digital Journey</h2>
-    <p>We offer innovative technology and customer-centric services across industries including Healthcare, Defense, Aerospace, Agriculture, and more.</p>
-  </section>
+<div id="chat-box">
+  <div id="messages"></div>
+  <div id="typing" style="display:none;">🤖 Quebec Assistant is typing...</div>
+  <input id="userInput" placeholder="Type your message..." />
+</div>
 
-  <section class="services">
-    <h3>Our Services</h3>
-    <div class="service"><strong>Technology & Engineering:</strong> Develop platforms that generate new opportunities.</div>
-    <div class="service"><strong>Product Management:</strong> Committed to delivering value across engagements.</div>
-    <div class="service"><strong>Data & AI:</strong> Intelligence that generates value for your enterprise.</div>
-    <div class="service"><strong>Customer Experience:</strong> Brands and services used by millions daily.</div>
-    <div class="service"><strong>Strategy Consulting:</strong> Guiding digital enterprise evolution.</div>
-  </section>
+<script>
+  const bubble = document.getElementById('chat-bubble');
+  const box = document.getElementById('chat-box');
+  const input = document.getElementById('userInput');
+  const messages = document.getElementById('messages');
+  const typing = document.getElementById('typing');
 
-  <!-- Chat UI -->
-  <div id="chat-bubble">💬 Chat with us</div>
-  <div id="chat-box">
-    <div id="messages"></div>
-    <input id="userInput" placeholder="Type your message..." />
-  </div>
+  bubble.onclick = () => {
+    box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+  };
 
-  <!-- Chat Script -->
-  <script>
-    const bubble = document.getElementById('chat-bubble');
-    const box = document.getElementById('chat-box');
-    const input = document.getElementById('userInput');
-    const messages = document.getElementById('messages');
+  async function sendMessage(message) {
+    messages.innerHTML += `<div class="user">${message}</div>`;
+    typing.style.display = 'block';
+    messages.scrollTop = messages.scrollHeight;
 
-    bubble.onclick = () => {
-      box.style.display = box.style.display === 'none' ? 'flex' : 'none';
-    };
+    try {
+      const res = await fetch('https://bhanutejadamera--quebec-chatbot-backend.hf.space/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+      const data = await res.json();
 
-    input.addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') {
-        const userMessage = input.value.trim();
-        if (!userMessage) return;
+      typing.style.display = 'none';
+      messages.innerHTML += `
+        <div class="bot">
+          <div class="bot-avatar">Q</div>
+          <div>${data.response}</div>
+        </div>
+      `;
+    } catch (err) {
+      typing.style.display = 'none';
+      messages.innerHTML += `<div class="bot">⚠️ Error talking to assistant.</div>`;
+    }
 
-        messages.innerHTML += `<div><b>You:</b> ${userMessage}</div>`;
-        input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+  }
 
-        try {
-          const res = await fetch('https://bhanutejadamera-quebec-chatbot-backend.hf.space/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: userMessage })
-          });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const message = input.value.trim();
+      if (!message) return;
+      input.value = '';
+      sendMessage(message);
+    }
+  });
+</script>
 
-          const data = await res.json();
-          messages.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
-        } catch (err) {
-          messages.innerHTML += `<div style="color:red;"><b>Bot:</b> Error talking to AI backend.</div>`;
-        }
+<!-- OPTIONAL: 📈 Matomo/GA Analytics -->
+<!-- Paste your Matomo/GA script here -->
 
-        messages.scrollTop = messages.scrollHeight;
-      }
-    });
-  </script>
 </body>
 </html>
