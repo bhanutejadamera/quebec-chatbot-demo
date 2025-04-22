@@ -62,14 +62,17 @@
       flex-direction: column;
       padding: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
     #messages {
       flex-grow: 1;
       overflow-y: auto;
       margin-bottom: 10px;
+      font-size: 14px;
     }
     input {
       width: 100%;
+      padding: 6px;
     }
   </style>
 </head>
@@ -78,6 +81,7 @@
     <h1>Quebec Solutions Inc.</h1>
     <p>Innovating Tomorrow, Today.</p>
   </header>
+
   <nav>
     <a href="#">Home</a>
     <a href="#">About</a>
@@ -86,56 +90,61 @@
     <a href="#">Careers</a>
     <a href="#">Support</a>
   </nav>
+
   <section class="hero">
     <h2>Powering your Digital Journey</h2>
-    <p>We offer innovative technology and customer-centric services that are simple, intuitive, and usable across industries including Healthcare, Defense, Aerospace, Agriculture, and more.</p>
-  </section>
-  <section class="services">
-    <h3>Our Services</h3>
-    <div class="service">
-      <strong>Technology & Engineering:</strong> Develop platforms that generate fresh opportunities.
-    </div>
-    <div class="service">
-      <strong>Product Management:</strong> Commitment to delivering value in all endeavors.
-    </div>
-    <div class="service">
-      <strong>Data & AI:</strong> Intelligence that generates enterprise value.
-    </div>
-    <div class="service">
-      <strong>Customer Experience:</strong> Brands and services used daily by millions.
-    </div>
-    <div class="service">
-      <strong>Strategy Consulting:</strong> Propelling digital enterprise evolution.
-    </div>
+    <p>We offer innovative technology and customer-centric services across industries including Healthcare, Defense, Aerospace, Agriculture, and more.</p>
   </section>
 
+  <section class="services">
+    <h3>Our Services</h3>
+    <div class="service"><strong>Technology & Engineering:</strong> Develop platforms that generate new opportunities.</div>
+    <div class="service"><strong>Product Management:</strong> Committed to delivering value across engagements.</div>
+    <div class="service"><strong>Data & AI:</strong> Intelligence that generates value for your enterprise.</div>
+    <div class="service"><strong>Customer Experience:</strong> Brands and services used by millions daily.</div>
+    <div class="service"><strong>Strategy Consulting:</strong> Guiding digital enterprise evolution.</div>
+  </section>
+
+  <!-- Chat UI -->
   <div id="chat-bubble">💬 Chat with us</div>
   <div id="chat-box">
     <div id="messages"></div>
     <input id="userInput" placeholder="Type your message..." />
   </div>
 
+  <!-- Chat Script -->
   <script>
     const bubble = document.getElementById('chat-bubble');
     const box = document.getElementById('chat-box');
     const input = document.getElementById('userInput');
     const messages = document.getElementById('messages');
 
-    bubble.onclick = () => box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+    bubble.onclick = () => {
+      box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+    };
 
     input.addEventListener('keydown', async (e) => {
       if (e.key === 'Enter') {
-        const userMessage = input.value;
+        const userMessage = input.value.trim();
+        if (!userMessage) return;
+
         messages.innerHTML += `<div><b>You:</b> ${userMessage}</div>`;
         input.value = '';
 
-        const res = await fetch('https://bhanutejadamera-quebec-chatbot-backend.hf.space/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: userMessage })
-        });
-        const data = await res.json();
-        messages.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+        try {
+          const res = await fetch('https://bhanutejadamera-quebec-chatbot-backend.hf.space/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userMessage })
+          });
+
+          const data = await res.json();
+          messages.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+        } catch (err) {
+          messages.innerHTML += `<div style="color:red;"><b>Bot:</b> Error talking to AI backend.</div>`;
+        }
+
+        messages.scrollTop = messages.scrollHeight;
       }
     });
   </script>
