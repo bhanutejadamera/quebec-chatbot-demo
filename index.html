@@ -139,7 +139,9 @@
           });
 
           const data = await res.json();
-          messages.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+
+          // ✅ Corrected line: get the actual message from the nested object
+          messages.innerHTML += `<div><b>Bot:</b> ${data.response.result}</div>`;
         } catch (err) {
           messages.innerHTML += `<div style="color:red;"><b>Bot:</b> Error talking to AI backend.</div>`;
         }
